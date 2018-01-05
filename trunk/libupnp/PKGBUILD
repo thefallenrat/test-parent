@@ -1,0 +1,29 @@
+# $Id$
+# Maintainer: Giovanni Scafora <giovanni@archlinux.org> 
+# Contributor: kastor <kastor@fobos.org.ar>
+
+pkgname=libupnp
+pkgver=1.6.24
+pkgrel=1
+pkgdesc="Portable Open Source UPnP Development Kit"
+arch=('x86_64')
+url="http://pupnp.sourceforge.net/"
+license=('BSD')
+depends=('glibc')
+makedepends=('pkgconfig')
+source=("http://downloads.sourceforge.net/sourceforge/pupnp/${pkgname}-${pkgver}.tar.bz2")
+md5sums=('c5f4a3b674741d85ef29258841ccd540')
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR=${pkgdir} install
+  install -Dm644 LICENSE ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE
+}

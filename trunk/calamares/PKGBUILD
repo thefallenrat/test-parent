@@ -1,0 +1,48 @@
+# Maintainer: artoo <artoo@cromnix.org>
+
+pkgname=calamares
+pkgver=3.1.12.1
+pkgrel=1
+pkgdesc='Distribution-independent installer framework'
+arch=('i686' 'x86_64')
+license=(GPL)
+url="https://github.com/artix-linux/calamares"
+license=('LGPL')
+depends=('kconfig' 'kcoreaddons' 'ki18n' 'solid' 'yaml-cpp' 'kpmcore>=3.1.0'
+         'boost-libs' 'hwinfo' 'qt5-svg' 'polkit-qt5' 'gtk-update-icon-cache'
+         'pythonqt' 'kiconthemes' 'kio' 'plasma-framework')
+makedepends=('extra-cmake-modules' 'qt5-tools' 'qt5-translations' 'boost')
+source=("https://github.com/artix-linux/calamares/archive/v$pkgver.tar.gz")
+sha256sums=('8c826caeed6b31c8f4c792b2f6f6a5f18f123139453b0e84a9527745af0718c4')
+
+prepare() {
+	cd $pkgname-$pkgver
+	# patches here
+}
+
+build() {
+	cd $pkgname-$pkgver
+
+	mkdir -p build
+	cd build
+        cmake .. \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_INSTALL_PREFIX=/usr \
+              -DCMAKE_INSTALL_LIBDIR=lib \
+              -DWITH_PYTHONQT:BOOL=ON \
+              -DSKIP_MODULES="webview interactiveterminal initramfs \
+                              initramfscfg dracut dracutlukscfg \
+                              dummyprocess dummypython dummycpp \
+                              dummypythonqt"
+        make
+}
+
+package() {
+	cd $pkgname-$pkgver/build
+	make DESTDIR="$pkgdir" install
+
+    install -dm755 ${pkgdir}/etc/calamares/modules
+    cd ${srcdir}/$pkgname-$pkgver
+    install -m755 data/artix/settings.conf ${pkgdir}/etc/calamares/settings.conf
+    install -m755 data/artix/modules/{machineid,finished,displaymanager,welcome,umount,locale}.conf ${pkgdir}/etc/calamares/modules/
+}
